@@ -15,13 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="SetsAndMaps.cs" />
-    <Compile Include="FeatureCollection.cs" />
-    <Compile Include="Maze.cs" />
-    <Compile Include="FindPairsTests.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="census.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
