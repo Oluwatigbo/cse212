@@ -13,10 +13,16 @@ public static class Recursion
     /// n <= 0, just return 0.   A loop should not be used.
     /// </summary>
     public static int SumSquaresRecursive(int n)
+{
+    // Base case: if n is less than or equal to 0, return 0
+    if (n <= 0)
     {
-        // TODO Start Problem 1
         return 0;
     }
+    // Recursive case: n^2 + SumSquaresRecursive(n - 1)
+    return n * n + SumSquaresRecursive(n - 1);
+}
+
 
     /// <summary>
     /// #############
@@ -37,10 +43,35 @@ public static class Recursion
     /// You can assume that the size specified is always valid (between 1 
     /// and the length of the letters list).
     /// </summary>
-    public static void PermutationsChoose(List<string> results, string letters, int size, string word = "")
+ public static void PermutationsChoose(List<string> results, string letters, int size, string word = "", bool[]? used = null)
+{
+    // Initialize the used array on the first call
+    if (used == null)
     {
-        // TODO Start Problem 2
+        used = new bool[letters.Length];
     }
+
+    // Base case: if the current word length equals the desired size
+    if (word.Length == size)
+    {
+        results.Add(word);
+        return;
+    }
+
+    // Recursive case: iterate through letters and build permutations
+    for (int i = 0; i < letters.Length; i++)
+    {
+        if (!used[i]) // Only use letters that haven't been used yet
+        {
+            used[i] = true; // Mark the letter as used
+            PermutationsChoose(results, letters, size, word + letters[i], used);
+            used[i] = false; // Backtrack: unmark the letter
+        }
+    }
+}
+
+
+
 
     /// <summary>
     /// #############
@@ -85,23 +116,28 @@ public static class Recursion
     /// the function for you to complete this task.
     /// </summary>
     public static decimal CountWaysToClimb(int s, Dictionary<int, decimal>? remember = null)
+{
+    // Initialize the dictionary for memoization
+    remember ??= new Dictionary<int, decimal>();
+
+    // Base Cases
+    if (s < 0) return 0;
+    if (s == 0) return 1;
+
+    // Check if the result is already computed
+    if (remember.ContainsKey(s))
     {
-        // Base Cases
-        if (s == 0)
-            return 0;
-        if (s == 1)
-            return 1;
-        if (s == 2)
-            return 2;
-        if (s == 3)
-            return 4;
-
-        // TODO Start Problem 3
-
-        // Solve using recursion
-        decimal ways = CountWaysToClimb(s - 1) + CountWaysToClimb(s - 2) + CountWaysToClimb(s - 3);
-        return ways;
+        return remember[s];
     }
+
+    // Recursive case: sum of ways to climb s-1, s-2, and s-3 stairs
+    decimal ways = CountWaysToClimb(s - 1, remember) + CountWaysToClimb(s - 2, remember) + CountWaysToClimb(s - 3, remember);
+    
+    // Store the result in the dictionary
+    remember[s] = ways;
+    return ways;
+}
+
 
     /// <summary>
     /// #############
@@ -117,9 +153,32 @@ public static class Recursion
     /// some of the string functions like IndexOf and [..X] / [X..] to be useful in solving this problem.
     /// </summary>
     public static void WildcardBinary(string pattern, List<string> results)
+{
+    GeneratePatterns(pattern, 0, "", results);
+}
+
+private static void GeneratePatterns(string pattern, int index, string current, List<string> results)
+{
+    // Base case: if we reach the end of the pattern
+    if (index == pattern.Length)
     {
-        // TODO Start Problem 4
+        results.Add(current);
+        return;
     }
+
+    // If the current character is '*', branch into two possibilities: '0' and '1'
+    if (pattern[index] == '*')
+    {
+        GeneratePatterns(pattern, index + 1, current + '0', results);
+        GeneratePatterns(pattern, index + 1, current + '1', results);
+    }
+    else
+    {
+        // If it's not a '*', just add the current character to the current string
+        GeneratePatterns(pattern, index + 1, current + pattern[index], results);
+    }
+}
+
 
     /// <summary>
     /// Use recursion to insert all paths that start at (0,0) and end at the
@@ -133,11 +192,34 @@ public static class Recursion
             currPath = new List<ValueTuple<int, int>>();
         }
         
-        // currPath.Add((1,2)); // Use this syntax to add to the current path
-
-        // TODO Start Problem 5
-        // ADD CODE HERE
-
-        // results.Add(currPath.AsString()); // Use this to add your path to the results array keeping track of complete maze solutions when you find the solution.
+        // Add the current position to the path
+    currPath.Add((x, y));
+    // Check if we have reached the end
+    if (maze.IsEnd(x, y))
+    {
+        results.Add(currPath.AsString());
+    }
+    else
+    {
+        // Explore all possible directions (right, down, left, up)
+        if (maze.IsValidMove(currPath, x + 1, y)) // Move right
+        {
+            SolveMaze(results, maze, x + 1, y, currPath);
+        }
+        if (maze.IsValidMove(currPath, x, y + 1)) // Move down
+        {
+            SolveMaze(results, maze, x, y + 1, currPath);
+        }
+        if (maze.IsValidMove(currPath, x - 1, y)) // Move left
+        {
+            SolveMaze(results, maze, x - 1, y, currPath);
+        }
+        if (maze.IsValidMove(currPath, x, y - 1)) // Move up
+        {
+            SolveMaze(results, maze, x, y - 1, currPath);
+        }
+    }
+    // Backtrack: remove the current position from the path
+    currPath.RemoveAt(currPath.Count - 1);
     }
 }
